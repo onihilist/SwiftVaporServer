@@ -6,8 +6,12 @@ struct SwiftCLI {
         let app = try await Application.make(.detect())
 
         app.get("health") { req in
-            let health: HealthData = HealthData.new()
-            print()
+            var health: HealthData = HealthData.new()
+            health.vms = [
+                VirtualMachine.new(),
+                VirtualMachine.new()
+            ]
+            return health
         }
 
         app.get("greet") { req in
