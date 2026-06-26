@@ -1,6 +1,8 @@
 import Vapor
 
 struct VirtualMachine: Content {
+    var id: String
+    var name: String
     var health: String
     var status: String
     var latency: Float32
@@ -8,6 +10,8 @@ struct VirtualMachine: Content {
 
     static func new() -> VirtualMachine {
         return VirtualMachine(
+            id: UUID().uuidString,
+            name: "VM-\(Int.random(in: 1000...9999))",
             health: "healthy",
             status: VMStatus.unknown.rawValue,
             latency: 0.0,
