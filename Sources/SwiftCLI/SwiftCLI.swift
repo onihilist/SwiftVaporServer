@@ -8,8 +8,8 @@ struct SwiftCLI {
         app.get("health") { req in
             var health: HealthData = HealthData.new()
             health.vms = [
-                VirtualMachine.new(),
-                VirtualMachine.new()
+                VirtualMachine(provider: .AWS),
+                VirtualMachine.new(provider: .GCP),
             ]
             return health
         }
