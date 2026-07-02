@@ -1,8 +1,12 @@
 import Testing
 @testable import SwiftCLI
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    // Swift Testing Documentation
-    // https://swiftpackageindex.com/swiftlang/swift-testing/documentation
+@Suite("[DATABASE] - Perform tests for the database...") struct DatabaseTests {
+    @Test func testDatabaseConnection() async throws {
+        print("Testing database connection...")
+    }
+
+    @Test func testCheckDatabaseSchema() async throws {
+        print("Checking database schema...")
+    }
 }

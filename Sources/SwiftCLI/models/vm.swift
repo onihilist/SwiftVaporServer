@@ -1,35 +1,26 @@
 import Vapor
 
-enum VMStatus: String, Codable {
-    case RUNNING
-    case STOPPED
-    case BOOTING
-    case SHUTTING_DOWN
-    case SUSPENDED
-    case TERMINATED
-    case CONFIGURING
-    case MAINTENANCE
-    case ERROR
-    case UNKNOWN
+enum VMStatus: String, Codable, Sendable {
+    case RUNNING, STOPPED, BOOTING, SHUTTING_DOWN, SUSPENDED,
+         TERMINATED, CONFIGURING, MAINTENANCE, ERROR, UNKNOWN
 }
 
-class CloudResource: Content {
+struct ResourceMetadata: Codable, Sendable {
     var id: String
     var provider: String
 
-    required init(provider: CloudProvider) {
-        if type(of: self) == CloudResource.self {
-            fatalError("CloudResource is abstract and cannot be instantiated directly")
-        }
+    init(provider: CloudProvider) {
         self.id = UUID().uuidString
         self.provider = provider.rawValue
     }
 }
 
-class VirtualMachine: CloudResource {
+struct VirtualMachine: Content {
+    var resource: ResourceMetadata
     var name: String
     var health: String
     var status: String
+    var address: String
     var latency: Float32
     var equipment: [String]?
     var cpu_usage: Float32
@@ -40,7 +31,7 @@ class VirtualMachine: CloudResource {
     var last_boot_time: Date?
     var last_shutdown_time: Date?
 
-    required init(provider: CloudProvider) {
+    init(provider: CloudProvider) {
         let prefix: String
         switch provider {
         case .AWS: prefix = "aws"
@@ -49,9 +40,11 @@ class VirtualMachine: CloudResource {
         case .DIGITAL_OCEAN: prefix = "do"
         }
 
+        self.resource = ResourceMetadata(provider: provider)
         self.name = "\(prefix)-VM-\(Int.random(in: 1000...9999))"
         self.health = "healthy"
-        self.status = VMStatus.unknown.rawValue
+        self.status = VMStatus.UNKNOWN.rawValue
+        self.address = "\(prefix)-\(Int.random(in: 1000...9999)).cloudprovider.com"
         self.latency = 0.0
         self.equipment = nil
         self.cpu_usage = 0.0
@@ -61,11 +54,9 @@ class VirtualMachine: CloudResource {
         self.uptime = 0
         self.last_boot_time = nil
         self.last_shutdown_time = nil
-
-        super.init(provider: provider)
     }
 
     static func new(provider: CloudProvider) -> VirtualMachine {
-        return VirtualMachine(provider: provider)
+        VirtualMachine(provider: provider)
     }
 }
