@@ -9,6 +9,7 @@ struct SwiftCLI {
         try await configure(app)
 
         let usersCollection = app.mongoDB["users"]
+        let vmsCollection = app.mongoDB["vms"]
 
         app.get("health") { req in
             var health: HealthData = HealthData.new()
@@ -38,6 +39,10 @@ struct SwiftCLI {
                 throw Abort(.notFound)
             }
             return user
+        }
+
+        app.get("vms") { req async throws -> [VirtualMachine] in
+            try await vmsCollection.find().decode(VirtualMachine.self).drain()
         }
 
         try await app.execute()
